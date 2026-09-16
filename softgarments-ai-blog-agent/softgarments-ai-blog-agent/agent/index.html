@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Softgarments AI Blog Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ═══ PASSCODE LOCK ═══ -->
+  <div class="lock-overlay" id="lockOverlay">
+    <div class="lock-card">
+      <div class="rail-brand-mark" style="margin: 0 auto 14px;">SG</div>
+      <h2 style="font-family:'Playfair Display',serif; margin-bottom:6px;">Softgarments AI Blog Agent</h2>
+      <p style="color:var(--ink-soft); font-size:13.5px; margin-bottom:18px;">Enter the passcode to continue.</p>
+      <input type="password" id="lockInput" placeholder="Passcode" />
+      <button class="btn btn-primary" id="lockBtn" style="width:100%; margin-top:12px;">Unlock</button>
+      <div class="error-box" id="lockError" hidden style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <div class="shell" id="shellRoot" hidden>
+
+    <!-- ═══ RAIL: pipeline steps + status ═══ -->
+    <aside class="rail">
+      <div class="rail-brand">
+        <span class="rail-brand-mark">SG</span>
+        <div>
+          <div class="rail-brand-name">Softgarments</div>
+          <div class="rail-brand-sub">AI Blog Agent</div>
+        </div>
+      </div>
+
+      <nav class="pipeline" id="pipeline">
+        <button class="pipeline-step is-active" data-step="input">
+          <span class="pipeline-num">1</span>
+          <span class="pipeline-label">Caption</span>
+        </button>
+        <button class="pipeline-step" data-step="analysis" disabled>
+          <span class="pipeline-num">2</span>
+          <span class="pipeline-label">Analysis &amp; SEO</span>
+        </button>
+        <button class="pipeline-step" data-step="draft" disabled>
+          <span class="pipeline-num">3</span>
+          <span class="pipeline-label">Blog Draft</span>
+        </button>
+        <button class="pipeline-step" data-step="publish" disabled>
+          <span class="pipeline-num">4</span>
+          <span class="pipeline-label">Review &amp; Export</span>
+        </button>
+      </nav>
+
+      <div class="rail-status">
+        <div class="status-row">
+          <span class="status-dot status-dot--on"></span>
+          <span>Website: softgarments.com</span>
+        </div>
+        <div class="status-row">
+          <span class="status-dot" id="ghDot"></span>
+          <span>GitHub: not connected (Phase 2)</span>
+        </div>
+        <div class="status-row" id="lastActionRow" hidden>
+          <span class="status-dot status-dot--on"></span>
+          <span id="lastActionText"></span>
+        </div>
+      </div>
+
+      <div class="rail-drafts">
+        <div class="rail-drafts-head">Saved drafts</div>
+        <div id="draftsList" class="rail-drafts-list">
+          <div class="rail-drafts-empty">No saved drafts yet</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ═══ MAIN ═══ -->
+    <main class="main">
+
+      <!-- STEP 1: input -->
+      <section class="panel" id="panel-input">
+        <div class="panel-head">
+          <h1>Paste your social media caption</h1>
+          <p class="panel-sub">Drop in the caption from Instagram, Facebook, or TikTok. The agent will find a genuinely useful blog angle — not just rewrite it.</p>
+        </div>
+        <textarea id="captionInput" placeholder="Example: Ajrak-Inspired Elegance, Made for You..."></textarea>
+        <div class="panel-actions">
+          <button class="btn btn-primary" id="analyzeBtn">Analyze Post</button>
+          <span class="hint">Takes 10&ndash;30 seconds</span>
+        </div>
+        <div class="error-box" id="inputError" hidden></div>
+      </section>
+
+      <!-- STEP 2: analysis + seo -->
+      <section class="panel" id="panel-analysis" hidden>
+        <div class="panel-head">
+          <h1>Content analysis &amp; SEO map</h1>
+          <p class="panel-sub">What the agent understood, and the keyword opportunity it found.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Content analysis</h3>
+            <dl class="kv" id="analysisKv"></dl>
+          </div>
+          <div class="card">
+            <h3>Content angle</h3>
+            <dl class="kv" id="angleKv"></dl>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>SEO keyword map</h3>
+          <div class="kw-group">
+            <span class="kw-label">Primary</span>
+            <div class="chips" id="kwPrimary"></div>
+          </div>
+          <div class="kw-group">
+            <span class="kw-label">Secondary</span>
+            <div class="chips" id="kwSecondary"></div>
+          </div>
+          <div class="kw-group">
+            <span class="kw-label">Long-tail</span>
+            <div class="chips" id="kwLongtail"></div>
+          </div>
+          <div class="kw-group">
+            <span class="kw-label">Questions</span>
+            <div class="chips" id="kwQuestions"></div>
+          </div>
+          <div class="kw-group">
+            <span class="kw-label">Semantic</span>
+            <div class="chips" id="kwSemantic"></div>
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-secondary" data-goto="input">&larr; Back</button>
+          <button class="btn btn-primary" data-goto="draft">Continue to draft &rarr;</button>
+        </div>
+      </section>
+
+      <!-- STEP 3: draft / editor -->
+      <section class="panel" id="panel-draft" hidden>
+        <div class="panel-head">
+          <h1>Blog draft</h1>
+          <p class="panel-sub">Edit anything directly. Use a command below for quick changes instead of editing by hand.</p>
+        </div>
+
+        <div class="command-bar">
+          <input type="text" id="commandInput" placeholder='Try: "make it shorter" · "add FAQ" · "more useful for Pakistani women" · "improve the title"' />
+          <button class="btn btn-secondary" id="commandBtn">Run</button>
+        </div>
+
+        <div class="field">
+          <label>Title</label>
+          <input type="text" id="fieldTitle" />
+        </div>
+
+        <div class="grid-3">
+          <div class="field">
+            <label>Category</label>
+            <select id="fieldCategory">
+              <option>Fashion</option>
+              <option>Style</option>
+              <option>Fabric</option>
+              <option>Garments</option>
+              <option>Trends</option>
+              <option>Sale</option>
+              <option>Designer</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Slug</label>
+            <input type="text" id="fieldSlug" />
+          </div>
+          <div class="field">
+            <label>Publish date</label>
+            <input type="date" id="fieldDate" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Excerpt</label>
+          <textarea id="fieldExcerpt" rows="2"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Blog body (HTML)</label>
+          <textarea id="fieldBody" rows="16" class="mono"></textarea>
+        </div>
+
+        <div class="field">
+          <label>FAQ</label>
+          <div id="faqEditor"></div>
+          <button class="btn-link" id="addFaqBtn">+ Add question</button>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Meta title</label>
+            <input type="text" id="fieldMetaTitle" />
+            <span class="char-count" id="metaTitleCount"></span>
+          </div>
+          <div class="field">
+            <label>Meta description</label>
+            <textarea id="fieldMetaDesc" rows="2"></textarea>
+            <span class="char-count" id="metaDescCount"></span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Featured image prompt</label>
+          <textarea id="fieldImagePrompt" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label>Image alt text</label>
+          <input type="text" id="fieldAltText" />
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-secondary" data-goto="analysis">&larr; Back</button>
+          <button class="btn btn-ghost" id="saveDraftBtn">Save draft</button>
+          <button class="btn btn-primary" data-goto="publish">Continue to review &rarr;</button>
+        </div>
+      </section>
+
+      <!-- STEP 4: quality + export -->
+      <section class="panel" id="panel-publish" hidden>
+        <div class="panel-head">
+          <h1>Review &amp; export</h1>
+          <p class="panel-sub">GitHub auto-publish arrives in Phase 2. For now, export the exact files to drop into your repo.</p>
+        </div>
+
+        <div class="card score-card">
+          <div class="score-ring" id="scoreRing">
+            <span id="scoreNumber">--</span>
+          </div>
+          <div class="score-warnings" id="scoreWarnings"></div>
+        </div>
+
+        <div class="card">
+          <h3>Preview</h3>
+          <div class="preview-frame">
+            <iframe id="previewFrame" title="Blog preview"></iframe>
+          </div>
+        </div>
+
+        <div class="panel-actions">
+          <button class="btn btn-secondary" data-goto="draft">&larr; Edit</button>
+          <button class="btn btn-ghost" id="downloadHtmlBtn">Download blog HTML</button>
+          <button class="btn btn-ghost" id="copyJsonBtn">Copy posts.json entry</button>
+          <button class="btn btn-primary" id="approveBtn">Approve &amp; export</button>
+        </div>
+
+        <div class="export-note" id="exportNote" hidden></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

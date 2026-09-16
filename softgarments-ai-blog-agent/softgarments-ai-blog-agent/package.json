@@ -1,0 +1,8 @@
+{
+  "name": "softgarments-ai-blog-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Phase 1: dashboard + AI blog generation for Softgarments (no GitHub write yet).",
+  "engines": { "node": ">=18" }
+}
