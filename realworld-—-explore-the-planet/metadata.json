@@ -1,0 +1,6 @@
+{
+  "name": "REALWORLD — Explore the Planet",
+  "description": "Ultra-realistic world tour and travel exploration platform. Explore real countries, cities, streets, famous landmarks, satellite maps, and authentic 360° panoramas from your browser.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
